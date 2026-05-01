@@ -1,9 +1,32 @@
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args){
-         ArrayList<Item> list = new ArrayList<>();
+    public static void main(String[] args) {
+        ArrayList<Item> list = new ArrayList<>();
+
+        try(BufferedReader reader = new BufferedReader(new FileReader("inventory.txt"))){
+
+            String line;
+            while((line = reader.readLine()) != null){
+                String [] parts = line.split(",");
+                String name = parts[0];
+                int quantity = Integer.parseInt(parts[1]);
+                double price = Double.parseDouble(parts[2]);
+                list.add(new Item(name, quantity, price));
+            }
+
+
+
+        }
+        catch (FileNotFoundException e){
+            System.out.println("file not found");
+        }
+        catch (IOException e){
+            System.out.println("could not read file");
+        }
 
         String choice = "";
 
@@ -20,7 +43,7 @@ public class Main {
                 switch (choice) {
                     case "1" -> {
                         boolean add = true;
-                        while(add) {
+                        while (add) {
                             System.out.print("Enter name of item: ");
                             String name = scanner.nextLine().toLowerCase();
 
@@ -35,7 +58,7 @@ public class Main {
                             Item newItem = new Item(name, quantity, price);
                             list.add(newItem);
                             System.out.print("Would you like to enter another item? (Y/N): ");
-                           String again = scanner.nextLine().toUpperCase();
+                            String again = scanner.nextLine().toUpperCase();
                             if (again.equals("N")) {
                                 add = false;
 
@@ -43,52 +66,54 @@ public class Main {
                         }
 
 
-
                     }
                     case "2" -> {
                         System.out.print("Which item would you like to remove? (enter name in lowercase): ");
                         String itemRemove = scanner.nextLine();
                         boolean removed = list.removeIf(i -> i.name.equalsIgnoreCase(itemRemove));
-                        if(removed){
+                        if (removed) {
                             System.out.println("item removed successfully");
                             Thread.sleep(2000);
-                        } else{
+                        } else {
                             System.out.println("item not found in inventory");
                         }
                     }
                     case "3" -> {
                         System.out.println("********** Current Inventory **********");
-                        if(list.isEmpty()){
+                        if (list.isEmpty()) {
                             System.out.println("Inventory is empty");
                             Thread.sleep(2000);
 
                         } else {
                             for (Item i : list) {
-                                System.out.printf("Item: %s | Quantity: %d | Price: $%.2f\n",  i.name ,  i.quantity, i.price);
+                                System.out.printf("Item: %s | Quantity: %d | Price: $%.2f\n", i.name, i.quantity, i.price);
                             }
                             Thread.sleep(2000);
                         }
                     }
-                    case "4" -> System.out.println("You have exited the program");
-
+                    case "4" -> {try (BufferedWriter writer = new BufferedWriter(new FileWriter("inventory.txt"))) {
+                        for (Item i : list) {
+                            writer.write(i.name + "," + i.quantity + "," + i.price + "\n");
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Could not write file");
+                    }
+                    System.out.println("You have exited the program");
+                }
 
                 }
 
 
             }
-        } catch(StackOverflowError e){
+        } catch (StackOverflowError e) {
             System.out.println("Stack OverFlow");
-        } catch(InterruptedException e){
+        } catch (InterruptedException e) {
             System.out.println("Thread was interrupted");
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             System.out.println("Enter a valid input");
         }
-
-
-
         scanner.close();
-        }
-
 
     }
+}
 
