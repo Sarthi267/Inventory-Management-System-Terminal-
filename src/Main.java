@@ -44,7 +44,7 @@ public class Main {
                     case "1" -> {
                         boolean add = true;
                         while (add) {
-                            System.out.print("Enter name of item: ");
+                            System.out.print("Enter name of item (no commas or special characters): ");
                             String name = scanner.nextLine().toLowerCase();
 
                             System.out.print("Enter quantity of item: ");
@@ -64,13 +64,11 @@ public class Main {
 
                             }
                         }
-
-
                     }
                     case "2" -> {
                         System.out.print("Which item would you like to remove? (enter name in lowercase): ");
                         String itemRemove = scanner.nextLine();
-                        boolean removed = list.removeIf(i -> i.name.equalsIgnoreCase(itemRemove));
+                        boolean removed = list.removeIf(i -> i.getName().equalsIgnoreCase(itemRemove));
                         if (removed) {
                             System.out.println("item removed successfully");
                             Thread.sleep(2000);
@@ -86,14 +84,14 @@ public class Main {
 
                         } else {
                             for (Item i : list) {
-                                System.out.printf("Item: %s | Quantity: %d | Price: $%.2f\n", i.name, i.quantity, i.price);
+                                System.out.printf("Item: %s | Quantity: %d | Price: $%.2f\n", i.getName(), i.getQuantity(), i.getPrice());
                             }
                             Thread.sleep(2000);
                         }
                     }
                     case "4" -> {try (BufferedWriter writer = new BufferedWriter(new FileWriter("inventory.txt"))) {
                         for (Item i : list) {
-                            writer.write(i.name + "," + i.quantity + "," + i.price + "\n");
+                            writer.write(i.getName() + "," + i.getQuantity() + "," + i.getPrice() + "\n");
                         }
                     } catch (IOException e) {
                         System.out.println("Could not write file");

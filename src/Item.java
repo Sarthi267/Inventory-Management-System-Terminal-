@@ -1,11 +1,9 @@
-
-
 public class Item {
 
 
-    String name;
-    int quantity;
-    double price;
+   private String name;
+   private int quantity;
+   private double price;
 
     public  Item(String name, int quantity, double price) {
         this.name = name;
@@ -15,4 +13,17 @@ public class Item {
     public Item(){
 
     }
+
+    public String getName() {
+        return name;
+    }
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+
 }
