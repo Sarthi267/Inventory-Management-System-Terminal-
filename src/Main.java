@@ -1,32 +1,14 @@
-
 import java.io.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        ArrayList<Item> list = new ArrayList<>();
+    public static void main(String[] args) throws SQLException, InterruptedException {
 
-        try(BufferedReader reader = new BufferedReader(new FileReader("inventory.txt"))){
-
-            String line;
-            while((line = reader.readLine()) != null){
-                String [] parts = line.split(",");
-                String name = parts[0];
-                int quantity = Integer.parseInt(parts[1]);
-                double price = Double.parseDouble(parts[2]);
-                list.add(new Item(name, quantity, price));
-            }
-
-
-
-        }
-        catch (FileNotFoundException e){
-            System.out.println("file not found");
-        }
-        catch (IOException e){
-            System.out.println("could not read file");
-        }
+        Connection conn = DriverManager.getConnection("jdbc:sqlite:inventory.db");
+        DatabaseManager.initializeDatabase(conn);
 
         String choice = "";
 
@@ -56,7 +38,7 @@ public class Main {
                             double price = Double.parseDouble(cost);
 
                             Item newItem = new Item(name, quantity, price);
-                            list.add(newItem);
+                            DatabaseManager.addItem(conn, newItem);
                             System.out.print("Would you like to enter another item? (Y/N): ");
                             String again = scanner.nextLine().toUpperCase();
                             if (again.equals("N")) {
@@ -68,50 +50,23 @@ public class Main {
                     case "2" -> {
                         System.out.print("Which item would you like to remove? (enter name in lowercase): ");
                         String itemRemove = scanner.nextLine();
-                        boolean removed = list.removeIf(i -> i.getName().equalsIgnoreCase(itemRemove));
-                        if (removed) {
-                            System.out.println("item removed successfully");
-                            Thread.sleep(2000);
-                        } else {
-                            System.out.println("item not found in inventory");
-                        }
+                        DatabaseManager.removeItem(conn, itemRemove);
                     }
-                    case "3" -> {
-                        System.out.println("********** Current Inventory **********");
-                        if (list.isEmpty()) {
-                            System.out.println("Inventory is empty");
-                            Thread.sleep(2000);
+                    case "3" -> DatabaseManager.viewItems(conn);
 
-                        } else {
-                            for (Item i : list) {
-                                System.out.printf("Item: %s | Quantity: %d | Price: $%.2f\n", i.getName(), i.getQuantity(), i.getPrice());
-                            }
-                            Thread.sleep(2000);
-                        }
+                    case "4" -> {
+                        System.out.println("Changes saved. Exiting...");
+                        conn.close();
                     }
-                    case "4" -> {try (BufferedWriter writer = new BufferedWriter(new FileWriter("inventory.txt"))) {
-                        for (Item i : list) {
-                            writer.write(i.getName() + "," + i.getQuantity() + "," + i.getPrice() + "\n");
-                        }
-                    } catch (IOException e) {
-                        System.out.println("Could not write file");
-                    }
-                    System.out.println("You have exited the program");
-                }
 
                 }
-
 
             }
         } catch (StackOverflowError e) {
-            System.out.println("Stack OverFlow");
-        } catch (InterruptedException e) {
-            System.out.println("Thread was interrupted");
+        System.out.println("Stack OverFlow");
         } catch (NumberFormatException e) {
-            System.out.println("Enter a valid input");
-        }
+        System.out.println("Enter a valid input");
+    }
         scanner.close();
-
     }
 }
-
